@@ -1,6 +1,6 @@
 # File Provider Progress
 
-Small macOS probe for File Provider sync progress. The first frontend is a CLI; the shared Swift core is intended to be reused by a Raycast extension and, later, an optional menu bar app.
+Small macOS probe for File Provider sync progress. There is a CLI and a raycast frontend, a menu bar app is planned for later.
 
 ![Raycast File Provider Progress screenshot](img/screenshot.png)
 
