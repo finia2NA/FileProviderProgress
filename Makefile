@@ -11,7 +11,7 @@ help:
 	@printf "Important targets:\n"
 	@printf "  make test             Run Swift tests\n"
 	@printf "  make status           Show current File Provider progress\n"
-	@printf "  make raycast-dev      Sync native source, bundle debug helper, and open Raycast dev mode\n"
+	@printf "  make raycast-dev      Build ignored debug helper and open Raycast dev mode\n"
 	@printf "  make raycast-check    Build the Store bundle and run Raycast/ESLint/TypeScript checks\n"
 	@printf "  make raycast-publish  Build, validate, and publish the Raycast extension\n"
 	@printf "\n"
@@ -61,7 +61,7 @@ watch-json:
 raycast-install:
 	cd $(RAYCAST_PATH) && $(NPM) install
 
-raycast-dev: raycast-bundle-swift-debug
+raycast-dev:
 	cd $(RAYCAST_PATH) && $(NPM) run dev
 
 raycast-sync-native:
