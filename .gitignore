@@ -8,4 +8,6 @@ internal_docs/
 raycast/node_modules/
 raycast/dist/
 raycast/.raycast/
+raycast/.raycast-swift-build/
+raycast/native/
 raycast/raycast-env.d.ts

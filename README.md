@@ -16,6 +16,7 @@ raycast/
   package.json                        Raycast extension manifest and npm scripts
   src/                                Raycast TypeScript/React frontend
   assets/bin/                         Production-style bundled Swift CLI output
+  native/                             Generated Swift source mirror for Raycast Store PRs
   metadata/                           Raycast Store screenshots
 Makefile                             Root convenience commands
 ```
@@ -68,7 +69,7 @@ Then start Raycast development mode:
 make raycast-dev
 ```
 
-`make raycast-dev` builds the Swift debug CLI, copies it to `raycast/assets/bin/fp-progress`, and launches Raycast development mode. Search Raycast for `File Provider Progress` to open the command. The Raycast command fetches one status snapshot when opened and includes a manual Refresh action; it does not poll in the background.
+`make raycast-dev` syncs the root Swift package into `raycast/native`, builds the Swift debug CLI from that mirror, copies it to `raycast/assets/bin/fp-progress`, and launches Raycast development mode. Search Raycast for `File Provider Progress` to open the command. The Raycast command fetches one status snapshot when opened and includes a manual Refresh action; it does not poll in the background.
 
 For a production-style build:
 
@@ -76,7 +77,9 @@ For a production-style build:
 make raycast-build
 ```
 
-That target builds a universal Swift CLI in release mode, copies it to `raycast/assets/bin/fp-progress`, and runs Raycast's production build validation. The copied binary is generated from this repo and committed for Raycast Store distribution.
+That target syncs `native/` into `raycast/native/`, builds a universal Swift CLI in release mode from the mirror, copies it to `raycast/assets/bin/fp-progress`, and runs Raycast's production build validation. The copied binary is generated from this repo and committed for Raycast Store distribution.
+
+`raycast/native/` is ignored in this repository because `native/` is the source of truth. Raycast's publish workflow copies the extension working directory into the Store PR, so the generated mirror is included for review even though it is not tracked in this repo.
 
 Useful Raycast checks:
 
