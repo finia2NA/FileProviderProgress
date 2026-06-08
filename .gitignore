@@ -1,0 +1,6 @@
+.build/
+.swiftpm/
+DerivedData/
+native/.build/
+native/.swiftpm/
+internal_docs/
