@@ -82,7 +82,10 @@ export function formatTransferProgressRow(label: string, progress: TransferProgr
   };
 }
 
-export function formatIndexingProgressRow(pending: number | null | undefined, total: number | null | undefined): ProgressRow {
+export function formatIndexingProgressRow(
+  pending: number | null | undefined,
+  total: number | null | undefined,
+): ProgressRow {
   if (pending === null || pending === undefined || total === null || total === undefined) {
     return {
       label: "Indexing",

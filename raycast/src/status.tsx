@@ -61,12 +61,7 @@ export default function Command() {
   const domains = state.report?.domains ?? [];
 
   return (
-    <List
-      isLoading={state.isLoading}
-      isShowingDetail
-      searchBarPlaceholder="Search File Provider domains"
-      throttle
-    >
+    <List isLoading={state.isLoading} isShowingDetail searchBarPlaceholder="Search File Provider domains" throttle>
       {domains.length === 0 && !state.isLoading ? (
         <List.EmptyView
           icon={Icon.Folder}
@@ -76,7 +71,12 @@ export default function Command() {
         />
       ) : (
         domains.map((domain) => (
-          <DomainItem key={`${domain.providerId}/${domain.domainId}`} domain={domain} report={state.report} onRefresh={load} />
+          <DomainItem
+            key={`${domain.providerId}/${domain.domainId}`}
+            domain={domain}
+            report={state.report}
+            onRefresh={load}
+          />
         ))
       )}
     </List>
@@ -142,9 +142,7 @@ function HealthTags({ domain }: { domain: DomainSnapshot }) {
       {domain.health.needsIndexing ? (
         <List.Item.Detail.Metadata.TagList.Item text="Needs Indexing" color={Color.Yellow} />
       ) : null}
-      {domain.health.isActive ? (
-        <List.Item.Detail.Metadata.TagList.Item text="Active" color={Color.Green} />
-      ) : null}
+      {domain.health.isActive ? <List.Item.Detail.Metadata.TagList.Item text="Active" color={Color.Green} /> : null}
       {!domain.health.needsAuth && !domain.health.needsIndexing && !domain.health.isActive ? (
         <List.Item.Detail.Metadata.TagList.Item text="OK" color={Color.Green} />
       ) : null}
@@ -214,10 +212,7 @@ function domainMarkdown(domain: DomainSnapshot, report: StatusReport | undefined
     return `# ${domain.displayName}\n\n**Probe error:** ${domain.probeError}`;
   }
 
-  const sections = [
-    `# ${domain.displayName}`,
-    progressTable(domain),
-  ];
+  const sections = [`# ${domain.displayName}`, progressTable(domain)];
 
   if (report) {
     sections.push(`**Report observed:** ${formatObservedAt(report.observedAt)}`);
@@ -236,7 +231,5 @@ function progressTable(domain: DomainSnapshot): string {
     rows.push(formatIndexingProgressRow(domain.health.pendingIndexableCount, domain.health.totalIndexableCount));
   }
 
-  return [
-    ...rows.map(formatProgressMarkdown),
-  ].join("\n\n");
+  return [...rows.map(formatProgressMarkdown)].join("\n\n");
 }
