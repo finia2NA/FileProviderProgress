@@ -5,7 +5,7 @@ PACKAGE_PATH := native
 RAYCAST_PATH := raycast
 INTERVAL ?= 10
 
-.PHONY: help build test clean list status status-json watch watch-json raycast-install raycast-dev raycast-bundle-swift-debug raycast-bundle-swift raycast-build raycast-lint raycast-store-lint raycast-typecheck
+.PHONY: help build test clean list status status-json watch watch-json raycast-install raycast-dev raycast-bundle-swift-debug raycast-bundle-swift raycast-build raycast-lint raycast-store-lint raycast-typecheck raycast-publish
 
 help:
 	@printf "Targets:\n"
@@ -25,6 +25,7 @@ help:
 	@printf "  make raycast-lint         Run local Raycast extension lint\n"
 	@printf "  make raycast-store-lint   Run strict Raycast Store metadata lint\n"
 	@printf "  make raycast-typecheck    Run Raycast extension TypeScript checks\n"
+	@printf "  make raycast-publish      Build, validate, and publish the Raycast extension\n"
 	@printf "  make clean        Remove SwiftPM build artifacts\n"
 
 build:
@@ -71,6 +72,9 @@ raycast-store-lint:
 
 raycast-typecheck:
 	cd $(RAYCAST_PATH) && $(NPM) run typecheck
+
+raycast-publish: raycast-build
+	cd $(RAYCAST_PATH) && $(NPM) run publish
 
 clean:
 	$(SWIFT) package --package-path $(PACKAGE_PATH) clean
