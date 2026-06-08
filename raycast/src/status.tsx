@@ -19,9 +19,7 @@ import {
   formatObservedAt,
   formatProgressMarkdown,
   formatTransfer,
-  formatTransferPercent,
   formatTransferProgressRow,
-  statusAccessory,
 } from "./formatting";
 import type { DomainSnapshot, StatusReport } from "./models";
 import { loadStatusReport } from "./probe";
@@ -99,13 +97,7 @@ function DomainItem({
   return (
     <List.Item
       title={domain.displayName}
-      subtitle={domain.rootPath}
       icon={domainStatusIcon(domain)}
-      accessories={[
-        { text: uploadAccessory(domain) },
-        { text: downloadAccessory(domain) },
-        { text: statusAccessory(domain) },
-      ]}
       detail={
         <List.Item.Detail
           markdown={markdown}
@@ -172,6 +164,7 @@ function DomainActions({
   return (
     <CommonActions onRefresh={onRefresh} report={report}>
       <ActionPanel.Section>
+        <Action.ShowInFinder title="Show Location in Finder" path={domain.rootPath} />
         <Action.CopyToClipboard title="Copy Domain JSON" content={JSON.stringify(domain, null, 2)} />
         <Action.CopyToClipboard title="Copy Domain Identifier" content={`${domain.providerId}/${domain.domainId}`} />
         <Action.CopyToClipboard title="Copy Root Path" content={domain.rootPath} />
@@ -246,12 +239,4 @@ function progressTable(domain: DomainSnapshot): string {
   return [
     ...rows.map(formatProgressMarkdown),
   ].join("\n\n");
-}
-
-function uploadAccessory(domain: DomainSnapshot): string {
-  return domain.upload ? `Up ${formatTransferPercent(domain.upload)}` : "Up -";
-}
-
-function downloadAccessory(domain: DomainSnapshot): string {
-  return domain.download ? `Down ${formatTransferPercent(domain.download)}` : "Down -";
 }
