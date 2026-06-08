@@ -2,7 +2,6 @@ import {
   Action,
   ActionPanel,
   Clipboard,
-  Color,
   Detail,
   Icon,
   List,
@@ -98,55 +97,9 @@ function DomainItem({
     <List.Item
       title={domain.displayName}
       icon={domainStatusIcon(domain)}
-      detail={
-        <List.Item.Detail
-          markdown={markdown}
-          metadata={
-            <List.Item.Detail.Metadata>
-              <List.Item.Detail.Metadata.Label title="Provider" text={domain.providerId} />
-              <List.Item.Detail.Metadata.Label title="Domain" text={domain.domainId} />
-              <List.Item.Detail.Metadata.Label title="Root" text={domain.rootPath} />
-              <List.Item.Detail.Metadata.Separator />
-              <List.Item.Detail.Metadata.Label title="Uploading" text={formatTransfer(domain.upload)} />
-              <List.Item.Detail.Metadata.Label title="Downloading" text={formatTransfer(domain.download)} />
-              {domain.health.pendingIndexableCount != null && domain.health.totalIndexableCount != null ? (
-                <List.Item.Detail.Metadata.Label
-                  title="Indexing"
-                  text={`${formatCount(domain.health.pendingIndexableCount)} pending / ${formatCount(domain.health.totalIndexableCount)} total`}
-                />
-              ) : null}
-              <List.Item.Detail.Metadata.Separator />
-              <List.Item.Detail.Metadata.TagList title="Health">
-                <HealthTags domain={domain} />
-              </List.Item.Detail.Metadata.TagList>
-              <List.Item.Detail.Metadata.Label title="Observed" text={formatObservedAt(domain.observedAt)} />
-            </List.Item.Detail.Metadata>
-          }
-        />
-      }
+      detail={<List.Item.Detail markdown={markdown} />}
       actions={<DomainActions domain={domain} report={report} onRefresh={onRefresh} />}
     />
-  );
-}
-
-function HealthTags({ domain }: { domain: DomainSnapshot }) {
-  if (domain.probeError) {
-    return <List.Item.Detail.Metadata.TagList.Item text="Probe Error" color={Color.Red} />;
-  }
-
-  return (
-    <>
-      {domain.health.needsAuth ? (
-        <List.Item.Detail.Metadata.TagList.Item text="Needs Sign-in" color={Color.Orange} />
-      ) : null}
-      {domain.health.needsIndexing ? (
-        <List.Item.Detail.Metadata.TagList.Item text="Needs Indexing" color={Color.Yellow} />
-      ) : null}
-      {domain.health.isActive ? <List.Item.Detail.Metadata.TagList.Item text="Active" color={Color.Green} /> : null}
-      {!domain.health.needsAuth && !domain.health.needsIndexing && !domain.health.isActive ? (
-        <List.Item.Detail.Metadata.TagList.Item text="OK" color={Color.Green} />
-      ) : null}
-    </>
   );
 }
 
@@ -209,16 +162,12 @@ function ErrorDetail({ error, onRefresh }: { error: Error; onRefresh: () => Prom
 
 function domainMarkdown(domain: DomainSnapshot, report: StatusReport | undefined): string {
   if (domain.probeError) {
-    return `# ${domain.displayName}\n\n**Probe error:** ${domain.probeError}`;
+    return [`# ${domain.displayName}`, `**Probe error:** ${domain.probeError}`, detailTable(domain, report)].join(
+      "\n\n",
+    );
   }
 
-  const sections = [`# ${domain.displayName}`, progressTable(domain)];
-
-  if (report) {
-    sections.push(`**Report observed:** ${formatObservedAt(report.observedAt)}`);
-  }
-
-  return sections.join("\n\n");
+  return [`# ${domain.displayName}`, progressTable(domain), detailTable(domain, report)].join("\n\n");
 }
 
 function progressTable(domain: DomainSnapshot): string {
@@ -232,4 +181,42 @@ function progressTable(domain: DomainSnapshot): string {
   }
 
   return [...rows.map(formatProgressMarkdown)].join("\n\n");
+}
+
+function detailTable(domain: DomainSnapshot, report: StatusReport | undefined): string {
+  const indexing =
+    domain.health.pendingIndexableCount != null && domain.health.totalIndexableCount != null
+      ? `${formatCount(domain.health.pendingIndexableCount)} pending / ${formatCount(domain.health.totalIndexableCount)} total`
+      : "No index total";
+
+  const rows: Array<[string, string]> = [
+    ["Provider", domain.providerId],
+    ["Domain", domain.domainId],
+    ["Root", domain.rootPath],
+    ["Uploading", formatTransfer(domain.upload)],
+    ["Downloading", formatTransfer(domain.download)],
+    ["Indexing", indexing],
+    ["Health", healthSummary(domain)],
+    ["Observed", formatObservedAt(domain.observedAt)],
+  ];
+
+  if (report) {
+    rows.push(["Report observed", formatObservedAt(report.observedAt)]);
+  }
+
+  return ["## Details", ...rows.map(([label, value]) => `**${label}**\n${value}`)].join("\n\n");
+}
+
+function healthSummary(domain: DomainSnapshot): string {
+  if (domain.probeError) {
+    return "Probe Error";
+  }
+
+  const statuses = [
+    domain.health.needsAuth ? "Needs Sign-in" : undefined,
+    domain.health.needsIndexing ? "Needs Indexing" : undefined,
+    domain.health.isActive ? "Active" : undefined,
+  ].filter((status): status is string => Boolean(status));
+
+  return statuses.length > 0 ? statuses.join(", ") : "OK";
 }

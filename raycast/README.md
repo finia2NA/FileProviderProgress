@@ -1,26 +1,23 @@
 # File Provider Progress
 
-Raycast frontend for the `fp-progress` Swift probe.
+View macOS File Provider sync activity from Raycast.
 
-## Development
+File Provider Progress shows upload, download, indexing, and health status for File Provider domains such as iCloud Drive, Synology Drive and other cloud sync providers that use Apple's File Provider system.
 
-From the repo root:
+## What You Can See
 
-```sh
-make raycast-install
-make raycast-dev
-```
+- Current upload and download progress when byte totals are reported by the provider
+- Remaining bytes in decimal and binary units
+- File Provider indexing counts
+- Domain health signals such as active work or required sign-in
+- Provider identifiers and local root paths for troubleshooting
 
-Development mode builds the Swift debug CLI, copies it to `raycast/assets/bin/fp-progress`, and launches Raycast with that bundled asset.
+## Notes
 
-## Production-style Build
+Some providers do not expose byte totals for every sync operation. In those cases, the extension can still show domain health and indexing status, but upload or download rows may report that no active byte total is available.
 
-```sh
-make raycast-build
-```
+The extension uses a bundled macOS helper to read File Provider status locally. No account credentials or cloud service tokens are required.
 
-This builds the Swift CLI in release mode, copies it to `raycast/assets/bin/fp-progress`, and runs Raycast's production build validation.
+## Preferences
 
-The bundled binary is generated from this repo's Swift source and intentionally ignored by git while the project is moving quickly.
-
-Strict Store linting requires the `author` field in `package.json` to be a real Raycast Store username. The default local lint target runs TypeScript checks; `npm run lint:raycast` and `npm run lint:store` are available once the author handle is finalized.
+The optional CLI Path preference is intended for troubleshooting or development. Most users should leave it empty so the extension uses the bundled helper.

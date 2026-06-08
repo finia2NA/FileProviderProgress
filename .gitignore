@@ -1,6 +1,7 @@
 .build/
 .swiftpm/
 DerivedData/
+.vscode/
 native/.build/
 native/.swiftpm/
 internal_docs/
