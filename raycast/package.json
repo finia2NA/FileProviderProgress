@@ -1,0 +1,73 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "file-provider-progress",
+  "title": "File Provider Progress",
+  "description": "Show macOS File Provider upload, download, indexing, and health status.",
+  "icon": "icon.png",
+  "author": "finia2na",
+  "license": "MIT",
+  "platforms": [
+    "macOS"
+  ],
+  "categories": [
+    "Productivity",
+    "System"
+  ],
+  "keywords": [
+    "file provider",
+    "sync",
+    "icloud",
+    "cloud",
+    "upload",
+    "download",
+    "progress"
+  ],
+  "preferences": [
+    {
+      "name": "cliPath",
+      "title": "CLI Path",
+      "description": "Optional path to a custom fp-progress binary. Development defaults to the Swift debug build; production defaults to the bundled binary.",
+      "type": "textfield",
+      "required": false,
+      "placeholder": "/path/to/fp-progress"
+    },
+    {
+      "name": "timeoutSeconds",
+      "title": "Probe Timeout",
+      "description": "Maximum time Raycast waits for fp-progress status JSON.",
+      "type": "textfield",
+      "required": false,
+      "default": "30"
+    }
+  ],
+  "commands": [
+    {
+      "name": "status",
+      "title": "File Provider Progress",
+      "subtitle": "Sync Status",
+      "description": "Show current macOS File Provider sync progress.",
+      "mode": "view",
+      "keywords": [
+        "status",
+        "sync",
+        "file provider progress"
+      ]
+    }
+  ],
+  "scripts": {
+    "dev": "ray develop",
+    "build": "ray build -e dist",
+    "lint": "tsc --noEmit",
+    "lint:raycast": "ray lint --relaxed",
+    "lint:store": "ray lint",
+    "typecheck": "tsc --noEmit",
+    "package-swift": "scripts/package-swift-binary.sh"
+  },
+  "dependencies": {
+    "@raycast/api": "^1.104.19"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.35",
+    "typescript": "^5.8.3"
+  }
+}

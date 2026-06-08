@@ -4,3 +4,8 @@ DerivedData/
 native/.build/
 native/.swiftpm/
 internal_docs/
+raycast/node_modules/
+raycast/dist/
+raycast/.raycast/
+raycast/raycast-env.d.ts
+raycast/assets/bin/fp-progress

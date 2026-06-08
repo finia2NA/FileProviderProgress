@@ -10,6 +10,10 @@ native/
   Sources/FileProviderProgressCore/   Shared probe, parser, models, formatting
   Sources/fp-progress/                CLI frontend
   Tests/FileProviderProgressCoreTests/
+raycast/
+  package.json                        Raycast extension manifest and npm scripts
+  src/                                Raycast TypeScript/React frontend
+  assets/bin/                         Production-style bundled Swift CLI output
 Makefile                             Root convenience commands
 ```
 
@@ -25,6 +29,9 @@ make status
 make status-json
 make watch
 make watch-json
+make raycast-install
+make raycast-dev
+make raycast-build
 ```
 
 `make watch` and `make watch-json` wait 10 seconds between completed polls by default. Override that wait time with:
@@ -43,6 +50,40 @@ swift run --package-path native fp-progress status
 swift run --package-path native fp-progress status --json
 swift run --package-path native fp-progress watch --interval 30
 ```
+
+## Raycast Development
+
+Install the Raycast extension dependencies once:
+
+```sh
+make raycast-install
+```
+
+Then start Raycast development mode:
+
+```sh
+make raycast-dev
+```
+
+`make raycast-dev` builds the Swift debug CLI, copies it to `raycast/assets/bin/fp-progress`, and launches Raycast development mode. Search Raycast for `File Provider Progress` to open the command. The Raycast command fetches one status snapshot when opened and includes a manual Refresh action; it does not poll in the background.
+
+For a production-style build:
+
+```sh
+make raycast-build
+```
+
+That target builds the Swift CLI in release mode, copies it to `raycast/assets/bin/fp-progress`, and runs Raycast's production build validation. The copied binary is generated from this repo and ignored by git while development is still moving.
+
+Useful Raycast checks:
+
+```sh
+make raycast-typecheck
+make raycast-lint
+make raycast-store-lint
+```
+
+`make raycast-lint` runs the local TypeScript check. `make raycast-store-lint` runs Raycast's strict Store metadata validation and requires the `author` in `raycast/package.json` to be a real Raycast Store username. Raycast's relaxed metadata lint is available inside `raycast/` as `npm run lint:raycast`, but it still performs the public author lookup.
 
 ## Output
 
