@@ -14,10 +14,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   domainStatusIcon,
+  formatCount,
+  formatIndexingProgressRow,
   formatObservedAt,
-  formatPercent,
-  formatRemaining,
+  formatProgressMarkdown,
   formatTransfer,
+  formatTransferPercent,
+  formatTransferProgressRow,
   statusAccessory,
 } from "./formatting";
 import type { DomainSnapshot, StatusReport } from "./models";
@@ -114,10 +117,10 @@ function DomainItem({
               <List.Item.Detail.Metadata.Separator />
               <List.Item.Detail.Metadata.Label title="Uploading" text={formatTransfer(domain.upload)} />
               <List.Item.Detail.Metadata.Label title="Downloading" text={formatTransfer(domain.download)} />
-              {domain.health.pendingIndexableCount !== undefined && domain.health.totalIndexableCount !== undefined ? (
+              {domain.health.pendingIndexableCount != null && domain.health.totalIndexableCount != null ? (
                 <List.Item.Detail.Metadata.Label
                   title="Indexing"
-                  text={`${domain.health.pendingIndexableCount} pending / ${domain.health.totalIndexableCount} total`}
+                  text={`${formatCount(domain.health.pendingIndexableCount)} pending / ${formatCount(domain.health.totalIndexableCount)} total`}
                 />
               ) : null}
               <List.Item.Detail.Metadata.Separator />
@@ -220,15 +223,8 @@ function domainMarkdown(domain: DomainSnapshot, report: StatusReport | undefined
 
   const sections = [
     `# ${domain.displayName}`,
-    `**Uploading:** ${formatTransfer(domain.upload)}${suffix(formatRemaining(domain.upload))}`,
-    `**Downloading:** ${formatTransfer(domain.download)}${suffix(formatRemaining(domain.download))}`,
+    progressTable(domain),
   ];
-
-  if (domain.health.pendingIndexableCount !== undefined && domain.health.totalIndexableCount !== undefined) {
-    sections.push(
-      `**Indexing:** ${domain.health.pendingIndexableCount} pending / ${domain.health.totalIndexableCount} total`,
-    );
-  }
 
   if (report) {
     sections.push(`**Report observed:** ${formatObservedAt(report.observedAt)}`);
@@ -237,14 +233,25 @@ function domainMarkdown(domain: DomainSnapshot, report: StatusReport | undefined
   return sections.join("\n\n");
 }
 
-function suffix(value: string | undefined): string {
-  return value ? `\n\n${value}` : "";
+function progressTable(domain: DomainSnapshot): string {
+  const rows = [
+    formatTransferProgressRow("Uploading", domain.upload),
+    formatTransferProgressRow("Downloading", domain.download),
+  ];
+
+  if (domain.health.pendingIndexableCount != null && domain.health.totalIndexableCount != null) {
+    rows.push(formatIndexingProgressRow(domain.health.pendingIndexableCount, domain.health.totalIndexableCount));
+  }
+
+  return [
+    ...rows.map(formatProgressMarkdown),
+  ].join("\n\n");
 }
 
 function uploadAccessory(domain: DomainSnapshot): string {
-  return domain.upload ? `Up ${formatPercent(domain.upload.fraction)}` : "Up -";
+  return domain.upload ? `Up ${formatTransferPercent(domain.upload)}` : "Up -";
 }
 
 function downloadAccessory(domain: DomainSnapshot): string {
-  return domain.download ? `Down ${formatPercent(domain.download.fraction)}` : "Down -";
+  return domain.download ? `Down ${formatTransferPercent(domain.download)}` : "Down -";
 }
