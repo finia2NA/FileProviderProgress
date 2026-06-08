@@ -2,7 +2,7 @@
 
 Small macOS probe for File Provider sync progress. There is a CLI and a raycast frontend, a menu bar app is planned for later.
 
-![Raycast File Provider Progress screenshot](img/screenshot.png)
+![Raycast File Provider Progress screenshot](raycast/metadata/file-provider-progress-1.png)
 
 ## Layout
 
@@ -16,6 +16,7 @@ raycast/
   package.json                        Raycast extension manifest and npm scripts
   src/                                Raycast TypeScript/React frontend
   assets/bin/                         Production-style bundled Swift CLI output
+  metadata/                           Raycast Store screenshots
 Makefile                             Root convenience commands
 ```
 
@@ -75,7 +76,7 @@ For a production-style build:
 make raycast-build
 ```
 
-That target builds the Swift CLI in release mode, copies it to `raycast/assets/bin/fp-progress`, and runs Raycast's production build validation. The copied binary is generated from this repo and ignored by git while development is still moving.
+That target builds a universal Swift CLI in release mode, copies it to `raycast/assets/bin/fp-progress`, and runs Raycast's production build validation. The copied binary is generated from this repo and committed for Raycast Store distribution.
 
 Useful Raycast checks:
 
@@ -85,7 +86,7 @@ make raycast-lint
 make raycast-store-lint
 ```
 
-`make raycast-lint` runs the local TypeScript check. `make raycast-store-lint` runs Raycast's strict Store metadata validation and requires the `author` in `raycast/package.json` to be a real Raycast Store username. Raycast's relaxed metadata lint is available inside `raycast/` as `npm run lint:raycast`, but it still performs the public author lookup.
+`make raycast-lint` runs Raycast linting, broad ESLint checks, and TypeScript checks. `make raycast-store-lint` runs the strict Store validation path. Raycast's relaxed metadata lint is available inside `raycast/` as `npm run lint:raycast`.
 
 ## Output
 
