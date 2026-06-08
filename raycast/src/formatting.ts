@@ -8,7 +8,8 @@ export type ProgressRow = {
   fraction: number;
   value: string;
   target: string;
-  accent: string;
+  gradientStart: string;
+  gradientEnd: string;
 };
 
 export function formatBytes(bytes: number): string {
@@ -57,7 +58,8 @@ export function formatRemaining(progress: TransferProgress | null | undefined): 
 }
 
 export function formatTransferProgressRow(label: string, progress: TransferProgress | null | undefined): ProgressRow {
-  const accent = label === "Uploading" ? "#0A84FF" : "#30D158";
+  const gradientStart = label === "Uploading" ? "#2DD4FF" : "#67E8A5";
+  const gradientEnd = label === "Uploading" ? "#0A84FF" : "#30D158";
 
   if (!progress) {
     return {
@@ -65,7 +67,8 @@ export function formatTransferProgressRow(label: string, progress: TransferProgr
       fraction: 1,
       value: "Idle",
       target: "No active byte total",
-      accent,
+      gradientStart,
+      gradientEnd,
     };
   }
 
@@ -74,7 +77,8 @@ export function formatTransferProgressRow(label: string, progress: TransferProgr
     fraction: transferFraction(progress),
     value: formatBytes(progress.completedBytes),
     target: formatBytes(progress.totalBytes),
-    accent,
+    gradientStart,
+    gradientEnd,
   };
 }
 
@@ -85,7 +89,8 @@ export function formatIndexingProgressRow(pending: number | null | undefined, to
       fraction: 1,
       value: "Idle",
       target: "No index total",
-      accent: "#FF9F0A",
+      gradientStart: "#FFD60A",
+      gradientEnd: "#FF9F0A",
     };
   }
 
@@ -95,14 +100,15 @@ export function formatIndexingProgressRow(pending: number | null | undefined, to
     fraction: indexingCompletionFraction(pending, total),
     value: `${formatCount(completed)} indexed`,
     target: `${formatCount(total)} total, ${formatCount(pending)} pending`,
-    accent: "#FF9F0A",
+    gradientStart: "#FFD60A",
+    gradientEnd: "#FF9F0A",
   };
 }
 
 export function formatProgressMarkdown(row: ProgressRow): string {
   return [
     `**${row.label}** · ${row.value} (${row.target})`,
-    `![${row.label} ${formatPercent(row.fraction)}](${progressSvgDataUri(row.fraction, row.accent)})`,
+    `![${row.label} ${formatPercent(row.fraction)}](${progressSvgDataUri(row.fraction, row.gradientStart, row.gradientEnd)})`,
   ].join("\n");
 }
 
@@ -143,22 +149,26 @@ function indexingCompletionFraction(pending: number, total: number): number {
   return (total - pending) / total;
 }
 
-function progressSvgDataUri(fraction: number, accent: string): string {
+function progressSvgDataUri(fraction: number, gradientStart: string, gradientEnd: string): string {
   const width = 560;
-  const height = 28;
-  const radius = 9;
-  const padding = 2;
+  const height = 18;
+  const radius = 6;
   const normalized = clamp01(fraction);
-  const trackWidth = width - padding * 2;
-  const fillWidth = Math.round(trackWidth * normalized);
+  const fillWidth = Math.round(width * normalized);
+  const gradientId = `g-${gradientStart.slice(1)}-${gradientEnd.slice(1)}`;
 
   const svg = [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`,
-    `<rect x="0" y="0" width="${width}" height="${height}" rx="${radius}" fill="#E7E7EA"/>`,
+    "<defs>",
+    `<linearGradient id="${gradientId}" x1="100%" y1="0%" x2="0%" y2="0%">`,
+    `<stop offset="0%" stop-color="${gradientStart}"/>`,
+    `<stop offset="100%" stop-color="${gradientEnd}"/>`,
+    "</linearGradient>",
+    "</defs>",
+    `<rect x="0" y="0" width="${width}" height="${height}" rx="${radius}" fill="#4A4A4D" opacity="0.35"/>`,
     fillWidth > 0
-      ? `<rect x="${padding}" y="${padding}" width="${fillWidth}" height="${height - padding * 2}" rx="${radius - padding}" fill="${accent}"/>`
+      ? `<rect x="0" y="0" width="${fillWidth}" height="${height}" rx="${radius}" fill="url(#${gradientId})"/>`
       : "",
-    `<rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="${radius}" fill="none" stroke="#D1D1D6"/>`,
     "</svg>",
   ].join("");
 
