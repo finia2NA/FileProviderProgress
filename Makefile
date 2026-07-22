@@ -5,7 +5,7 @@ PACKAGE_PATH := native
 RAYCAST_PATH := raycast
 INTERVAL ?= 10
 
-.PHONY: help build test clean list status status-json watch watch-json raycast-install raycast-dev raycast-check raycast-sync-native raycast-verify-native raycast-bundle-swift-debug raycast-bundle-swift raycast-build raycast-lint raycast-store-lint raycast-typecheck raycast-publish
+.PHONY: help build test clean list status status-json watch watch-json raycast-install raycast-dev raycast-check raycast-sync-native raycast-verify-native raycast-bundle-swift-debug raycast-bundle-swift raycast-build raycast-test raycast-lint raycast-store-lint raycast-typecheck raycast-publish
 
 help:
 	@printf "Important targets:\n"
@@ -26,6 +26,7 @@ help:
 	@printf "Raycast helper targets:\n"
 	@printf "  make raycast-install       Install Raycast extension dependencies\n"
 	@printf "  make raycast-build         Sync native source, bundle release helper, and build extension\n"
+	@printf "  make raycast-test          Test bundled-helper permission repair\n"
 	@printf "  make raycast-lint          Run Raycast lint, ESLint, and TypeScript checks\n"
 	@printf "  make raycast-sync-native   Mirror native/ into ignored raycast/native/ for Store packaging\n"
 	@printf "  make raycast-verify-native Verify raycast/native/ matches native/\n"
@@ -79,10 +80,13 @@ raycast-bundle-swift: raycast-sync-native
 raycast-build: raycast-bundle-swift
 	cd $(RAYCAST_PATH) && $(NPM) run build
 
+raycast-test:
+	cd $(RAYCAST_PATH) && $(NPM) test
+
 raycast-lint:
 	cd $(RAYCAST_PATH) && $(NPM) run lint
 
-raycast-check: raycast-build raycast-lint
+raycast-check: raycast-build raycast-test raycast-lint
 
 raycast-store-lint:
 	cd $(RAYCAST_PATH) && $(NPM) run lint:store

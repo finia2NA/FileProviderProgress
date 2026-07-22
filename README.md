@@ -85,11 +85,12 @@ Useful Raycast checks:
 
 ```sh
 make raycast-typecheck
+make raycast-test
 make raycast-lint
 make raycast-store-lint
 ```
 
-`make raycast-lint` runs Raycast linting, broad ESLint checks, and TypeScript checks. `make raycast-store-lint` runs the strict Store validation path. Raycast's relaxed metadata lint is available inside `raycast/` as `npm run lint:raycast`.
+`make raycast-test` checks the bundled helper's runtime permission repair. `make raycast-lint` runs Raycast linting, broad ESLint checks, and TypeScript checks. `make raycast-store-lint` runs the strict Store validation path. Raycast's relaxed metadata lint is available inside `raycast/` as `npm run lint:raycast`.
 
 ## Output
 
